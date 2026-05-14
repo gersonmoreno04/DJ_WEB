@@ -19,7 +19,6 @@ const createEvent = async (req, res) => {
             direccion, numeroPersonas, paquete, cantidadHoras 
         } = req.body;
 
-        // --- NUEVO: CANDADO DE FECHAS ---
         // Buscamos si ya existe un evento registrado exactamente en esa misma fecha
         const fechaOcupada = await Event.findOne({ fechaEvento });
         
@@ -28,8 +27,7 @@ const createEvent = async (req, res) => {
                 mensaje: 'Lo sentimos, esta fecha ya está reservada por otro cliente. Por favor, elige un día diferente.' 
             });
         }
-        // --------------------------------
-
+        
         // 2. Lógica de Negocio: Cálculo de Precios Base
         let precioBase = 0;
         if (paquete === 'Servicio DJ') {
@@ -90,15 +88,15 @@ const getEvents = async (req, res) => {
         // 1. Atrapamos los posibles filtros que nos mande el frontend por la URL
         const { estadoReserva, mes } = req.query;
         
-        // 2. Creamos una consulta vacía (por defecto traerá todo)
+        // 2. Creamos una consulta vacía 
         let query = {}; 
 
-        // 3. Si el admin pide filtrar por estado (ej. ?estadoReserva=Pendiente)
+        // 3. Si el admin pide filtrar por estado 
         if (estadoReserva) {
             query.estadoReserva = estadoReserva;
         }
 
-        // 4. Si el admin pide filtrar por mes (ej. ?mes=11 para noviembre)
+        // 4. Si el admin pide filtrar por mes 
         if (mes) {
             // Le decimos a MongoDB que extraiga el mes de la fecha guardada y lo compare
             query.$expr = { $eq: [{ $month: "$fechaEvento" }, parseInt(mes)] };

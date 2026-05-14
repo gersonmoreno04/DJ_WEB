@@ -74,10 +74,10 @@ const calculateShipping = async (req, res) => {
     }
 };
 
-// No olvides exportar esta tercera función
+
 module.exports = {
     getProducts,
     createProduct,
-    calculateShipping // <-- Añade esta línea
+    calculateShipping 
 };
 

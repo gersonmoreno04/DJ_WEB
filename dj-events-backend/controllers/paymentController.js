@@ -18,7 +18,7 @@ const createPayment = async (req, res) => {
                 pending: 'http://localhost:5000/api/status'
             },
             auto_return: 'approved',
-            // Le decimos a Mercado Pago a qué ruta avisarnos (en producción cambiaremos localhost por tu dominio)
+            // Le decimos a Mercado Pago a qué ruta avisarnos
             notification_url: 'https://tu-dominio.com/api/pagos/webhook' 
         };
 
@@ -31,21 +31,15 @@ const createPayment = async (req, res) => {
     }
 };
 
-// NUEVA FUNCIÓN: Recibir la notificación de pago
+//Recibir la notificación de pago
 const receiveWebhook = async (req, res) => {
     try {
         const payment = req.query;
-
         // Si Mercado Pago nos avisa que el evento fue un "pago"
         if (payment.type === 'payment') {
             console.log('🔔 ¡Mercado Pago nos notificó un pago!', payment);
-            
-            // Aquí en el futuro buscaremos el Evento en MongoDB usando el ID del pago
-            // y lo actualizaremos así:
-            // await Event.findOneAndUpdate(..., { anticipoPagado: true, estadoReserva: 'Anticipo Pagado' });
         }
-
-        // Es obligatorio responderle con un 200 OK rápido a Mercado Pago para que deje de avisarnos
+        
         res.status(200).send('Notificación recibida');
     } catch (error) {
         console.error('Error en el webhook:', error);
@@ -53,7 +47,6 @@ const receiveWebhook = async (req, res) => {
     }
 };
 
-// No olvides exportar ambas funciones
 module.exports = {
     createPayment,
     receiveWebhook

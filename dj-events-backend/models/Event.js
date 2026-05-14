@@ -46,7 +46,7 @@ const eventSchema = new mongoose.Schema({
     cantidadHoras: { 
         type: Number, 
         required: true, 
-        default: 5 // El base es de 5 horas según el documento
+        default: 5 // El base es de 5 horas
     },
     horasExtra: { 
         type: Number, 
