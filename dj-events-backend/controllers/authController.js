@@ -1,30 +1,29 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
-// Función auxiliar para generar el JWT
 const generarToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d', // El token expira en 30 días
+        expiresIn: '8h' // Reducido de 30d a 8h — sesión de trabajo razonable
     });
 };
 
-// @desc    Registrar un nuevo administrador (Usaremos esto solo una vez)
+// @desc    Registrar administrador
+// @route   POST /api/auth/register
 const registrarAdmin = async (req, res) => {
-    const { correo, password } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errores: errors.array() });
+    }
 
+    const { correo, password } = req.body;
     try {
-        // Verificamos si ya existe alguien con ese correo
         const userExists = await User.findOne({ correo });
         if (userExists) {
-            return res.status(400).json({ mensaje: 'El usuario ya existe' });
+            // Mismo mensaje que "no existe" para no revelar si el correo está registrado
+            return res.status(400).json({ mensaje: 'No se pudo completar el registro.' });
         }
-
-        // Creamos el usuario (nuestro modelo User.js se encargará de encriptar el password automáticamente)
-        const user = await User.create({
-            correo,
-            password
-        });
-
+        const user = await User.create({ correo, password });
         if (user) {
             res.status(201).json({
                 _id: user._id,
@@ -32,22 +31,25 @@ const registrarAdmin = async (req, res) => {
                 token: generarToken(user._id)
             });
         } else {
-            res.status(400).json({ mensaje: 'Datos de usuario inválidos' });
+            res.status(400).json({ mensaje: 'Datos de usuario inválidos.' });
         }
     } catch (error) {
-        res.status(500).json({ mensaje: 'Error en el servidor', error: error.message });
+        res.status(500).json({ mensaje: 'Error en el servidor.' });
     }
 };
 
-// @desc    Autenticar usuario y conseguir el Token (LOGIN)
+// @desc    Login administrador
+// @route   POST /api/auth/login
 const loginAdmin = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errores: errors.array() });
+    }
+
     const { correo, password } = req.body;
-
     try {
-        // 1. Buscamos al usuario por su correo
         const user = await User.findOne({ correo });
-
-        // 2. Verificamos que el usuario exista y que la contraseña coincida
+        // Mensaje genérico — no revela si el correo existe o no (user enumeration)
         if (user && (await user.matchPassword(password))) {
             res.json({
                 _id: user._id,
@@ -55,14 +57,11 @@ const loginAdmin = async (req, res) => {
                 token: generarToken(user._id)
             });
         } else {
-            res.status(401).json({ mensaje: 'Correo o contraseña incorrectos' });
+            res.status(401).json({ mensaje: 'Credenciales incorrectas.' });
         }
     } catch (error) {
-        res.status(500).json({ mensaje: 'Error en el servidor', error: error.message });
+        res.status(500).json({ mensaje: 'Error en el servidor.' });
     }
 };
 
-module.exports = {
-    registrarAdmin,
-    loginAdmin
-};
+module.exports = { registrarAdmin, loginAdmin };
