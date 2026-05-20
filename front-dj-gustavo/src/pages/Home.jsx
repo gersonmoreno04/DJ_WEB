@@ -1,0 +1,23 @@
+import { useState } from 'react';
+import Navbar from '../components/Navbar';
+import Hero from '../components/Hero';
+import Reviews from '../components/Reviews';
+import Servicios from '../components/Servicios';
+import Contacto from '../components/Contacto';
+import Footer from '../components/Footer';
+
+export default function Home() {
+    // Aquí guardamos la memoria del paquete elegido (por defecto el básico)
+    const [paquete, setPaquete] = useState('basico');
+
+    return (
+        <div className="selection:bg-primary selection:text-on-primary min-h-screen">
+            <Navbar />
+            <Hero />
+            <Reviews />
+            <Servicios paquete={paquete} setPaquete={setPaquete} />
+            <Contacto paquete={paquete} setPaquete={setPaquete} />
+            <Footer />
+        </div>
+    );
+}
