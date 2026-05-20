@@ -29,9 +29,9 @@ export default function Hero() {
                             Cotizar Ahora
                         </a>
 
-                        <button className="border border-secondary text-secondary px-8 md:px-10 py-4 md:py-5 rounded-lg font-label-md text-label-md uppercase tracking-widest hover:bg-secondary/10 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">
+                        <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" className="border border-secondary text-secondary px-8 md:px-10 py-4 md:py-5 rounded-lg font-label-md text-label-md uppercase tracking-widest hover:bg-secondary/10 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">
                             <span className="material-symbols-outlined text-base">chat</span> WhatsApp
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
