@@ -1,25 +1,32 @@
 const { MercadoPagoConfig, Preference } = require('mercadopago');
+const crypto = require('crypto');
 
 // @desc    Generar link de pago para el anticipo
+// @route   POST /api/pagos/crear-link
+// @access  Público
 const createPayment = async (req, res) => {
     try {
-        const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN });
+        const client = new MercadoPagoConfig({
+            accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
+        });
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
         const body = {
             items: [{
-                title: 'Anticipo Reserva DJ / Producción',
+                title: 'Anticipo Reserva DJ / Producción GDL',
                 quantity: 1,
-                unit_price: 1500, 
+                unit_price: 1500,
                 currency_id: 'MXN'
             }],
             back_urls: {
-                success: 'http://localhost:5000/api/status', 
-                failure: 'http://localhost:5000/api/status',
-                pending: 'http://localhost:5000/api/status'
+                success: `${frontendUrl}/reserva?estado=exitoso`,
+                failure: `${frontendUrl}/reserva?estado=fallido`,
+                pending: `${frontendUrl}/reserva?estado=pendiente`
             },
-            auto_return: 'approved',
-            // Le decimos a Mercado Pago a qué ruta avisarnos
-            notification_url: 'https://tu-dominio.com/api/pagos/webhook' 
+            /*auto_return: 'approved',
+            // FIX: usar variable de entorno para el webhook en producción
+            notification_url: process.env.WEBHOOK_URL || 'https://tu-dominio.com/api/pagos/webhook'*/
         };
 
         const preference = new Preference(client);
@@ -27,27 +34,46 @@ const createPayment = async (req, res) => {
 
         res.status(200).json({ id: result.id, linkPago: result.init_point });
     } catch (error) {
-        res.status(500).json({ mensaje: 'Error al generar el link', error: error.message });
+        // Agrega esta línea para ver qué está fallando realmente
+        console.error('[ERROR CREAR PREFERENCIA MP]:', error); 
+        
+        // No exponer el error real en producción
+        res.status(500).json({ mensaje: 'Error al generar el link de pago.' });
     }
 };
 
-//Recibir la notificación de pago
+// @desc    Recibir notificación de Mercado Pago (webhook)
+// @route   POST /api/pagos/webhook
+// @access  Público (verificado por firma)
 const receiveWebhook = async (req, res) => {
     try {
-        const payment = req.query;
-        // Si Mercado Pago nos avisa que el evento fue un "pago"
-        if (payment.type === 'payment') {
-            console.log('🔔 ¡Mercado Pago nos notificó un pago!', payment);
+        // Verificación de firma HMAC de Mercado Pago
+        const xSignature   = req.headers['x-signature'];
+        const xRequestId   = req.headers['x-request-id'];
+        const secret       = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+
+        if (secret && xSignature && xRequestId) {
+            const dataId = req.query['data.id'] || req.body?.data?.id || '';
+            const manifest = `id:${dataId};request-id:${xRequestId};ts:${xSignature.split(',').find(p => p.startsWith('ts=')).split('=')[1]};`;
+            const [, v1] = xSignature.split(',').find(p => p.startsWith('v1='))?.split('=') || [];
+            const hash = crypto.createHmac('sha256', secret).update(manifest).digest('hex');
+            if (hash !== v1) {
+                console.warn('[WEBHOOK] Firma inválida — posible petición falsa.');
+                return res.status(401).send('Firma inválida.');
+            }
         }
-        
-        res.status(200).send('Notificación recibida');
+
+        const payment = req.query;
+        if (payment.type === 'payment') {
+            console.log('[WEBHOOK] Pago recibido:', payment['data.id']);
+            // TODO: actualizar estadoReserva del evento a 'Anticipo Pagado'
+        }
+
+        res.status(200).send('OK');
     } catch (error) {
-        console.error('Error en el webhook:', error);
-        res.status(500).send('Error interno');
-    }
+    console.error('[PAGO ERROR]', error); // ← cambia esta línea
+    res.status(500).json({ mensaje: 'Error al generar el link de pago.' });
+}
 };
 
-module.exports = {
-    createPayment,
-    receiveWebhook
-};
+module.exports = { createPayment, receiveWebhook };
