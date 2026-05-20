@@ -12,7 +12,7 @@ export default function Navbar() {
         <nav className="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-[0_0_40px_rgba(232,179,255,0.1)]">
             <div className="flex justify-between items-center w-full px-4 md:px-16 py-4 mx-auto">
                 {/* Lo cambié a un Link para que darle clic al logo te regrese al inicio */}
-                <Link to="/ " className="font-headline-md text-2xl md:text-3xl font-black tracking-tighter text-on-surface dark:text-on-surface">
+                <Link to="/" className="font-headline-md text-2xl md:text-3xl font-black tracking-tighter text-on-surface dark:text-on-surface">
                     GDL PRODUCTION
                 </Link>
 
