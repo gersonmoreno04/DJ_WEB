@@ -4,8 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const connectDB = require('./config/db');
 
-const cors = require('cors'); 
-app.use(cors()); 
+
 
 // Inicializar la app y conectar a la BD
 const app = express();
