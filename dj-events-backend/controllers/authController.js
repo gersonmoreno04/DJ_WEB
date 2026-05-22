@@ -4,12 +4,10 @@ const { validationResult } = require('express-validator');
 
 const generarToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '8h' // Reducido de 30d a 8h — sesión de trabajo razonable
+        expiresIn: '8h' 
     });
 };
-
-// @desc    Registrar administrador
-// @route   POST /api/auth/register
+//Registrar admin
 const registrarAdmin = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -20,7 +18,6 @@ const registrarAdmin = async (req, res) => {
     try {
         const userExists = await User.findOne({ correo });
         if (userExists) {
-            // Mismo mensaje que "no existe" para no revelar si el correo está registrado
             return res.status(400).json({ mensaje: 'No se pudo completar el registro.' });
         }
         const user = await User.create({ correo, password });
@@ -38,8 +35,7 @@ const registrarAdmin = async (req, res) => {
     }
 };
 
-// @desc    Login administrador
-// @route   POST /api/auth/login
+//Login para el admin
 const loginAdmin = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -49,7 +45,7 @@ const loginAdmin = async (req, res) => {
     const { correo, password } = req.body;
     try {
         const user = await User.findOne({ correo });
-        // Mensaje genérico — no revela si el correo existe o no (user enumeration)
+        // Mensaje genérico
         if (user && (await user.matchPassword(password))) {
             res.json({
                 _id: user._id,
