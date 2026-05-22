@@ -1,7 +1,7 @@
 const Product = require('../models/Product');
 const { validationResult } = require('express-validator');
 
-// @desc    Obtener todos los productos (Público)
+//Obtener los productos
 const getProducts = async (req, res) => {
     try {
         const products = await Product.find({});
@@ -10,17 +10,13 @@ const getProducts = async (req, res) => {
         res.status(500).json({ mensaje: 'Error al obtener los productos.' });
     }
 };
-
-// @desc    Crear producto (Admin)
+//Creacion de prodcuto
 const createProduct = async (req, res) => {
     try {
         const { nombre, precio, descripcion, medidas, fotos, tags, color, linkAmazon } = req.body;
-
-        // Validar que las fotos sean URLs y no scripts
         if (fotos && !fotos.every(f => /^https?:\/\//.test(f))) {
             return res.status(400).json({ mensaje: 'Las fotos deben ser URLs válidas (https).' });
         }
-
         const product = new Product({ nombre, precio, descripcion, medidas, fotos, tags, color, linkAmazon });
         const createdProduct = await product.save();
         res.status(201).json(createdProduct);
@@ -28,8 +24,7 @@ const createProduct = async (req, res) => {
         res.status(400).json({ mensaje: 'Error al crear el producto.' });
     }
 };
-
-// @desc    Eliminar producto (Admin)
+//Eliminar producto (Admin)
 const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
@@ -39,15 +34,12 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ mensaje: 'Error al eliminar el producto.' });
     }
 };
-
-// @desc    Cotizar envío
+//Cotizar envío
 const calculateShipping = async (req, res) => {
     try {
         const { estado, distanciaKm } = req.body;
         const e = estado.toUpperCase().trim();
-
         let costoEnvio, mensaje, requiereCotizacionManual = false;
-
         if (!['CDMX', 'CIUDAD DE MEXICO', 'CIUDAD DE MÉXICO'].includes(e)) {
             costoEnvio = null;
             mensaje = 'Envío al interior de la república. Nos pondremos en contacto para cotizar.';
@@ -59,7 +51,6 @@ const calculateShipping = async (req, res) => {
             costoEnvio = 200;
             mensaje = 'Envío estándar dentro de la CDMX.';
         }
-
         res.json({ estadoDestino: estado, distanciaCalculada: `${distanciaKm} km`, costoEnvio, mensaje, requiereCotizacionManual });
     } catch (error) {
         res.status(500).json({ mensaje: 'Error al calcular el envío.' });
