@@ -21,7 +21,7 @@ export default function Hero() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row flex-wrap gap-4 md:gap-6">
-                        {/* AQUÍ ESTÁ LA MAGIA: Cambiamos <button> por <a> y agregamos el href */}
+                        {/* Servicios */}
                         <a
                             href="#servicios"
                             className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-8 md:px-10 py-4 md:py-5 rounded-lg font-label-md text-label-md uppercase tracking-widest neon-glow-primary hover:scale-105 transition-transform w-full sm:w-auto text-center"
