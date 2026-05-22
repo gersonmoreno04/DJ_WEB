@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-
 export default function Equipo() {
-    // ── Estados: catálogo + calculadora de envíos ──────────────────────────────
+    // Estados del catalogo y como calcular el envio
     const [productos, setProductos] = useState([]);
     const [loadingProductos, setLoadingProductos] = useState(true);
 
@@ -12,8 +11,7 @@ export default function Equipo() {
     const [distancia, setDistancia] = useState('');
     const [resultadoEnvio, setResultadoEnvio] = useState(null);
     const [loadingEnvio, setLoadingEnvio] = useState(false);
-
-    // ── Carga de productos desde el backend ────────────────────────────────────
+    // ── Carga de productos desde el back
     useEffect(() => {
         const fetchProductos = async () => {
             try {
@@ -28,18 +26,14 @@ export default function Equipo() {
         };
         fetchProductos();
     }, []);
-
-    // ── Helpers ────────────────────────────────────────────────────────────────
     const formatearDinero = (num) =>
         new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num);
-
     const cerrarModal = () => {
         setShowModal(false);
         setResultadoEnvio(null);
         setDistancia('');
     };
-
-    // ── Cotización de envío ────────────────────────────────────────────────────
+    // ── Cotización de envío 
     const handleCotizar = async (e) => {
         e.preventDefault();
         setLoadingEnvio(true);
@@ -60,7 +54,6 @@ export default function Equipo() {
         }
     };
 
-    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <div className="selection:bg-primary selection:text-on-primary min-h-screen bg-surface text-on-surface flex flex-col relative">
             <Navbar />
@@ -101,7 +94,7 @@ export default function Equipo() {
                     </button>
                 </div>
 
-                {/* ── MODAL DE COTIZACIÓN ──────────────────────────────────────── */}
+                {/*  MODAL DE COTIZACIÓN  */}
                 {showModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                         <div className="glass-card p-8 rounded-2xl w-full max-w-md relative border border-white/20 shadow-2xl">
@@ -184,7 +177,7 @@ export default function Equipo() {
                         </div>
                     </div>
                 )}
-                {/* ── FIN MODAL ────────────────────────────────────────────────── */}
+                {/*FIN MODAL*/}
 
                 {/* Catálogo dinámico */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
