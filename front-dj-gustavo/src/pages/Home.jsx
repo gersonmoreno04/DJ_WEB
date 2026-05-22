@@ -7,7 +7,7 @@ import Contacto from '../components/Contacto';
 import Footer from '../components/Footer';
 
 export default function Home() {
-    // Aquí guardamos la memoria del paquete elegido (por defecto el básico)
+    // Se guarda el paquete elegido
     const [paquete, setPaquete] = useState('basico');
 
     return (
