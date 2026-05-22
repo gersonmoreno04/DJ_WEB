@@ -4,13 +4,11 @@ const { check, validationResult } = require('express-validator');
 const { getProducts, createProduct, calculateShipping } = require('../controllers/productController');
 const { protect } = require('../middleware/authMiddleware');
 
-// GET /api/productos (Público)
+//ruta de los productos al publico
 router.get('/', getProducts);
-
-// POST /api/productos (Privado - requiere Token)
+//Ruta de productos con token 
 router.post('/', protect, createProduct);
-
-// POST /api/productos/cotizar-envio 
+//ruta para cotizar el envio
 router.post('/cotizar-envio', [
     check('estado', 'El estado es obligatorio').not().isEmpty().trim().escape(),
     check('distanciaKm', 'La distancia debe ser un número válido').isNumeric()
