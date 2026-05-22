@@ -12,13 +12,13 @@ const passwordRules = check('password')
     .matches(/[A-Z]/)
     .withMessage('La contraseña debe contener al menos una mayúscula');
 
-// POST /api/auth/register
+//ruta para regfistrar
 router.post('/register', [
     check('correo', 'Incluye un correo válido').isEmail().normalizeEmail(),
     passwordRules
 ], registrarAdmin);
 
-// POST /api/auth/login
+//ruta del login
 router.post('/login', [
     check('correo', 'Incluye un correo válido').isEmail().normalizeEmail(),
     check('password', 'La contraseña es obligatoria').notEmpty()
