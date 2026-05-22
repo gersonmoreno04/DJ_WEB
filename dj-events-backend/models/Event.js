@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-    // Datos del Cliente recopilados del formulario
+    // Datos del Cliente
     nombre: { 
         type: String, 
         required: [true, 'El nombre es obligatorio'], 
@@ -16,7 +16,6 @@ const eventSchema = new mongoose.Schema({
         required: [true, 'El correo es obligatorio'],
         lowercase: true
     },
-    
     // Datos del Evento
     fechaEvento: { 
         type: Date, 
@@ -36,7 +35,6 @@ const eventSchema = new mongoose.Schema({
         enum: ['10-100', '100-200', '200-300', '300 o más'],
         required: true
     },
-    
     // Servicios Contratados
     paquete: {
         type: String,
@@ -52,15 +50,13 @@ const eventSchema = new mongoose.Schema({
         type: Number, 
         default: 0 
     },
-
-    // Datos Financieros calculados por nuestro Backend
     totalCotizado: { 
         type: Number, 
         required: true 
     },
     anticipoPagado: { 
         type: Boolean, 
-        default: false // Cambiará a true cuando el webhook de Mercado Pago nos avise
+        default: false 
     },
     estadoReserva: {
         type: String,
