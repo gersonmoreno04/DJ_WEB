@@ -1,17 +1,13 @@
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 const crypto = require('crypto');
 
-// @desc    Generar link de pago para el anticipo
-// @route   POST /api/pagos/crear-link
-// @access  Público
+//Generar link de pago 
 const createPayment = async (req, res) => {
     try {
         const client = new MercadoPagoConfig({
             accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
         });
-
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-
         const body = {
             items: [{
                 title: 'Anticipo Reserva DJ / Producción GDL',
@@ -24,34 +20,22 @@ const createPayment = async (req, res) => {
                 failure: `${frontendUrl}/reserva?estado=fallido`,
                 pending: `${frontendUrl}/reserva?estado=pendiente`
             },
-            /*auto_return: 'approved',
-            // FIX: usar variable de entorno para el webhook en producción
-            notification_url: process.env.WEBHOOK_URL || 'https://tu-dominio.com/api/pagos/webhook'*/
         };
 
         const preference = new Preference(client);
         const result = await preference.create({ body });
-
         res.status(200).json({ id: result.id, linkPago: result.init_point });
     } catch (error) {
-        // Agrega esta línea para ver qué está fallando realmente
         console.error('[ERROR CREAR PREFERENCIA MP]:', error); 
-        
-        // No exponer el error real en producción
         res.status(500).json({ mensaje: 'Error al generar el link de pago.' });
     }
 };
-
-// @desc    Recibir notificación de Mercado Pago (webhook)
-// @route   POST /api/pagos/webhook
-// @access  Público (verificado por firma)
+//Recibir la notificacion de mercado pago 
 const receiveWebhook = async (req, res) => {
     try {
-        // Verificación de firma HMAC de Mercado Pago
         const xSignature   = req.headers['x-signature'];
         const xRequestId   = req.headers['x-request-id'];
         const secret       = process.env.MERCADOPAGO_WEBHOOK_SECRET;
-
         if (secret && xSignature && xRequestId) {
             const dataId = req.query['data.id'] || req.body?.data?.id || '';
             const manifest = `id:${dataId};request-id:${xRequestId};ts:${xSignature.split(',').find(p => p.startsWith('ts=')).split('=')[1]};`;
@@ -62,13 +46,10 @@ const receiveWebhook = async (req, res) => {
                 return res.status(401).send('Firma inválida.');
             }
         }
-
         const payment = req.query;
         if (payment.type === 'payment') {
             console.log('[WEBHOOK] Pago recibido:', payment['data.id']);
-            // TODO: actualizar estadoReserva del evento a 'Anticipo Pagado'
         }
-
         res.status(200).send('OK');
     } catch (error) {
     console.error('[PAGO ERROR]', error); // ← cambia esta línea
