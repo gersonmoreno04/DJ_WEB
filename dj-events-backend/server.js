@@ -7,18 +7,14 @@ const connectDB = require('./config/db');
 
 const app = express();
 connectDB();
-
-// ── Seguridad HTTP headers ────────────────────────────────────────────────────
+//Paaquete de seguridad
 app.use(helmet());
-
-// ── CORS — solo permite orígenes definidos en .env ────────────────────────────
+//Restringe mis peticiones https
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
     : ['http://localhost:5173'];
-
 app.use(cors({
     origin: (origin, callback) => {
-        // Permitir peticiones sin origin (ej. Postman, curl) solo en desarrollo
         if (!origin && process.env.NODE_ENV !== 'production') return callback(null, true);
         if (allowedOrigins.includes(origin)) return callback(null, true);
         callback(new Error(`Origen no permitido por CORS: ${origin}`));
@@ -28,16 +24,15 @@ app.use(cors({
     credentials: true
 }));
 
-// ── Rate limiting global ──────────────────────────────────────────────────────
 const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
+    windowMs: 15 * 60 * 1000,
     max: 100,
     standardHeaders: true,
     legacyHeaders: false,
     message: { mensaje: 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.' }
 });
 
-// Rate limiter estricto para auth (protege contra brute-force)
+//Reducimos las peticiones para evitar ataques de fuierza bruta
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
@@ -45,25 +40,21 @@ const authLimiter = rateLimit({
 });
 
 app.use(globalLimiter);
-app.use(express.json({ limit: '10kb' })); // Limita tamaño del body (evita payload attacks)
-
-// ── Rutas ─────────────────────────────────────────────────────────────────────
+app.use(express.json({ limit: '10kb' }));
+//rutas
 const eventRoutes   = require('./routes/eventRoutes');
 const authRoutes    = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
-
 app.use('/api/eventos',   eventRoutes);
 app.use('/api/auth',      authLimiter, authRoutes);
 app.use('/api/productos', productRoutes);
 app.use('/api/pagos',     paymentRoutes);
-
-// ── Ruta de health check ──────────────────────────────────────────────────────
+// ── Ruta de health check 
 app.get('/api/status', (req, res) => {
-    res.json({ mensaje: 'Servidor seguro y funcionando correctamente 🚀' });
+    res.json({ mensaje: 'Servidor seguro y funcionando correctamente' });
 });
-
-// ── Manejo global de errores (sin exponer stack traces) ───────────────────────
+//Manejo global de errores
 app.use((err, req, res, next) => {
     console.error(`[ERROR] ${err.message}`);
     const status = err.status || 500;
