@@ -19,10 +19,10 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Las medidas son obligatorias'] 
     },
     fotos: [{ 
-        type: String // Será un arreglo de URLs de las imágenes
+        type: String //Para que se puedan agregar urls de las fotos
     }], 
     tags: [{ 
-        type: String // Arreglo de palabras clave
+        type: String 
     }], 
     color: { 
         type: String 
@@ -32,7 +32,7 @@ const productSchema = new mongoose.Schema({
         trim: true 
     }
 }, {
-    timestamps: true // Esto crea automáticamente los campos 'createdAt' y 'updatedAt'
+    timestamps: true 
 });
 
 module.exports = mongoose.model('Product', productSchema);
