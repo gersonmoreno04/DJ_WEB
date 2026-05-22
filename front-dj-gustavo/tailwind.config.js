@@ -32,7 +32,6 @@ export default {
                 "headline-2xl": ["Montserrat", "sans-serif"],
                 "body-md": ["Inter", "sans-serif"],
             },
-            // ¡Esta es la pieza que faltaba!
             fontSize: {
                 "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
                 "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
