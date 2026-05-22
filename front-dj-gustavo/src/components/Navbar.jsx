@@ -2,7 +2,6 @@ import { NavLink, Link } from 'react-router-dom';
 
 export default function Navbar() {
     // Función auxiliar para no repetir tanto código en las clases de Tailwind
-    // Si está activa (isActive), le pone el borde morado. Si no, lo deja transparente.
     const navLinkClass = ({ isActive }) =>
         isActive
             ? "text-primary border-b-2 border-primary pb-1 font-label-md text-label-md transition-all"
@@ -11,7 +10,7 @@ export default function Navbar() {
     return (
         <nav className="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-[0_0_40px_rgba(232,179,255,0.1)]">
             <div className="flex justify-between items-center w-full px-4 md:px-16 py-4 mx-auto">
-                {/* Lo cambié a un Link para que darle clic al logo te regrese al inicio */}
+                {/* Regresar al inicio */}
                 <Link to="/" className="font-headline-md text-2xl md:text-3xl font-black tracking-tighter text-on-surface dark:text-on-surface">
                     GDL PRODUCTION
                 </Link>
